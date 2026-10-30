@@ -1,138 +1,298 @@
 # RetailPriceForecast
 
-> **A small machine-learning portfolio project:** employee questions to SQL, URL risk classification, and banana ripeness prediction.
+A small machine-learning portfolio project featuring three independent ML applications:
 
-Despite the repository name, the current code does **not** forecast retail prices. It contains three independent ML demos and notebooks for exploring and training them.
+1. Employee Question-to-SQL Assistant
+2. URL Risk Classification
+3. Banana Ripeness Prediction
+
+> **Note:** Despite the repository name, this project does not currently forecast retail prices. It contains three independent machine-learning demos with notebooks for data preparation, model training, and evaluation.
+
+---
 
 ## Projects
 
-| Demo | What it does | Main files |
-|---|---|---|
-| Employee query assistant | Classifies an English employee-data question, asks for missing details, and builds a supported MySQL query. Data-changing queries require confirmation. | `ask_query.py`, `build_query_datasets.py`, `ml.ipynb`, `mysql_setup.sql` |
-| URL risk classifier | Estimates whether a URL looks benign or harmful from URL-text features. It does not open or visit the URL. | `url_classifier.py`, `url.ipynb`, `data/url_dataset.csv` |
-| Banana ripeness classifier | Predicts one of four image classes—unripe, ripe, overripe, or rotten—and gives a rough storage-day guide. | `banana_classifier.py`, `banana.ipynb`, `data/banana_ripeness/` |
+| Demo                       | Description                                                                                                                                                          | Main Files                                                               |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Employee Query Assistant   | Classifies English questions about employee data, identifies missing information, and generates supported MySQL queries. Data-changing queries require confirmation. | `ask_query.py`, `build_query_datasets.py`, `ml.ipynb`, `mysql_setup.sql` |
+| URL Risk Classifier        | Predicts whether a URL looks benign or potentially harmful using URL-text features. It does not open or visit the URL.                                               | `url_classifier.py`, `url.ipynb`, `data/url_dataset.csv`                 |
+| Banana Ripeness Classifier | Classifies banana images into four categories: unripe, ripe, overripe, and rotten. It also provides approximate storage-day guidance.                                | `banana_classifier.py`, `banana.ipynb`, `data/banana_ripeness/`          |
 
-## Repository layout
+---
+
+## Repository Structure
 
 ```text
-.
-├── ask_query.py                 # Employee question-to-SQL assistant
-├── build_query_datasets.py      # Creates the intent and ambiguity CSV datasets
-├── banana_classifier.py         # Loads the banana image model and predicts a class
-├── banana.ipynb                # Banana dataset preparation, training, and evaluation
-├── banana_model.pt              # Saved banana model
-├── url_classifier.py           # URL feature extraction and prediction
-├── url.ipynb                    # URL dataset preparation, training, and evaluation
-├── url_model.joblib             # Saved URL model
-├── ml.ipynb                     # Employee intent and ambiguity model exploration
-├── mysql_setup.sql              # Creates the demo employee database and table
+RetailPriceForecast/
+│
+├── ask_query.py
+├── build_query_datasets.py
+├── banana_classifier.py
+├── banana.ipynb
+├── banana_model.pt
+├── url_classifier.py
+├── url.ipynb
+├── url_model.joblib
+├── ml.ipynb
+├── mysql_setup.sql
+│
 └── data/
     ├── intent_dataset.csv
     ├── ambiguity_dataset.csv
     ├── url_dataset.csv
-    └── banana_ripeness/         # Image dataset (train/valid/test)
+    │
+    └── banana_ripeness/
+        ├── train/
+        ├── valid/
+        └── test/
 ```
 
-The employee intent and ambiguity datasets are generated from templates and augmented examples; they are not a collection of real user requests.
+The employee intent and ambiguity datasets are generated using synthetic templates and augmented examples. They do not represent real user requests.
+
+---
 
 ## Requirements
 
-- Python 3.10 or later
-- Jupyter Notebook (to run the notebooks)
-- MySQL Server (only for the employee query assistant)
+* Python 3.10 or later
+* Jupyter Notebook
+* MySQL Server (only required for the Employee Query Assistant)
 
-Install the Python packages:
+### Install Dependencies
+
+Run the following command:
 
 ```bash
 python -m pip install numpy pandas scikit-learn joblib Pillow torch matplotlib mysql-connector-python jupyter
 ```
 
-PyTorch installation can differ by operating system and hardware. If the command above does not install a compatible build, follow the [official PyTorch installation selector](https://pytorch.org/get-started/locally/).
+**Note:** PyTorch installation may vary depending on your operating system and hardware. If the installation fails, use the official installation guide:
 
-## Getting started
+[PyTorch Installation Guide](https://pytorch.org/get-started/locally/)
 
-Clone the repository and enter its folder:
+---
+
+## Getting Started
+
+### 1. Clone the Repository
 
 ```bash
 git clone <your-repository-url>
+
 cd RetailPriceForecast
 ```
 
-### 1. Employee question-to-SQL assistant
+### 2. Employee Question-to-SQL Assistant
 
-1. Start MySQL Server.
-2. Run `mysql_setup.sql` in MySQL Workbench (or another MySQL client). It creates `company_db` and a sample `employees` table with 500 records.
-3. From the repository root, start the assistant:
+This application converts natural-language employee questions into supported MySQL queries.
 
-   ```bash
-   python ask_query.py
-   ```
+**Setup:**
 
-4. Ask a question about employees, for example:
+1. Start your MySQL Server.
+2. Open MySQL Workbench.
+3. Execute the `mysql_setup.sql` file.
+4. This creates a database named `company_db` and an `employees` table containing 500 sample records.
 
-   ```text
-   Show employees in the IT department
-   ```
+**Run the application:**
 
-   Enter `quit`, `exit`, or `q` to stop. The assistant trains its text classifiers from the **training rows** in `data/intent_dataset.csv` and `data/ambiguity_dataset.csv` when it starts.
+```bash
+python ask_query.py
+```
 
-The connection defaults to `127.0.0.1:3306` and database `company_db`. Set these environment variables to use a different local MySQL account:
+**Example question:**
 
-| Variable | Purpose | Default |
-|---|---|---|
-| `MYSQL_HOST` | MySQL server host | `127.0.0.1` |
-| `MYSQL_PORT` | MySQL server port | `3306` |
-| `MYSQL_USER` | MySQL username | Prompted; falls back to `root` |
-| `MYSQL_PASSWORD` | MySQL password | Prompted securely |
+```text
+Show employees in the IT department
+```
 
-### 2. URL risk classifier
+The application classifies the question, checks for missing information, and generates a supported SQL query.
 
-The saved model is loaded by `url_classifier.py`. From the repository root, try a prediction with:
+To stop the application, enter:
+
+```text
+quit
+```
+
+You can also use `exit` or `q`.
+
+The assistant trains its text classifiers using the training rows from:
+
+* `data/intent_dataset.csv`
+* `data/ambiguity_dataset.csv`
+
+**MySQL Configuration**
+
+The default database connection settings are:
+
+| Variable         | Purpose           | Default                        |
+| ---------------- | ----------------- | ------------------------------ |
+| `MYSQL_HOST`     | MySQL server host | `127.0.0.1`                    |
+| `MYSQL_PORT`     | MySQL server port | `3306`                         |
+| `MYSQL_USER`     | MySQL username    | Prompted; falls back to `root` |
+| `MYSQL_PASSWORD` | MySQL password    | Prompted securely              |
+
+---
+
+### 3. URL Risk Classifier
+
+The URL classifier analyzes URL-text features and predicts whether a URL appears benign or potentially harmful.
+
+**Run a prediction:**
 
 ```bash
 python -c "from url_classifier import predict_url; print(predict_url('https://example.com/account'))"
 ```
 
-To retrain or inspect the workflow, open `url.ipynb` in Jupyter and run its cells from top to bottom. If the URL dataset is not already present, the notebook downloads it.
+**Model file:**
 
-### 3. Banana ripeness classifier
+```text
+url_model.joblib
+```
 
-The saved model is loaded by `banana_classifier.py`. Pass it the path to a banana image:
+**Retrain the model:**
+
+1. Open `url.ipynb` in Jupyter Notebook.
+2. Run the notebook cells from top to bottom.
+3. The notebook prepares the dataset, trains the classifier, and evaluates its performance.
+
+If the URL dataset is not available locally, the notebook downloads it.
+
+---
+
+### 4. Banana Ripeness Classifier
+
+The banana classifier uses image-based machine learning to identify the ripeness stage of a banana.
+
+It supports four classes:
+
+* Unripe
+* Ripe
+* Overripe
+* Rotten
+
+**Run a prediction:**
 
 ```bash
 python -c "from banana_classifier import predict_banana; print(predict_banana('path/to/banana.jpg'))"
 ```
 
-To retrain or inspect the workflow, open `banana.ipynb` in Jupyter and run its cells from top to bottom. The notebook prepares the image dataset and saves `banana_model.pt`.
+Replace `path/to/banana.jpg` with the actual image path.
 
-### Employee dataset generation
+**Model file:**
 
-To regenerate the synthetic employee question datasets:
+```text
+banana_model.pt
+```
+
+**Retrain the model:**
+
+1. Open `banana.ipynb` in Jupyter Notebook.
+2. Run all cells from top to bottom.
+3. The notebook prepares the image dataset, trains the model, and evaluates its performance.
+4. The trained model is saved as `banana_model.pt`.
+
+The classifier also provides approximate storage-day guidance based on the predicted ripeness class.
+
+---
+
+## Employee Dataset Generation
+
+The employee question datasets can be regenerated using:
 
 ```bash
 python build_query_datasets.py
 ```
 
-This writes `data/intent_dataset.csv` and `data/ambiguity_dataset.csv`.
+This generates two CSV files:
 
-## Data sources and attribution
+```text
+data/
+├── intent_dataset.csv
+└── ambiguity_dataset.csv
+```
 
-- **Banana images:** [Banana Ripeness Classification on Roboflow Universe](https://universe.roboflow.com/roboflow-universe-projects/banana-ripeness-classification), provided under **CC BY 4.0**. The notebook downloads a pinned dataset archive from [Hugging Face](https://huggingface.co/datasets/Sapek007/banana-ripeness).
-- **URL data:** the notebook downloads the public `malicious_phish.csv` dataset from [SahinMuhammetAbdullah/urldataset](https://github.com/SahinMuhammetAbdullah/urldataset). Check the source dataset's terms before redistribution.
-- **Employee query data:** generated locally by `build_query_datasets.py` from synthetic templates.
+These datasets contain synthetic employee-related questions used to train the intent and ambiguity classifiers.
 
-## Important limitations
+---
 
-- **URL predictions are estimates, not a safety guarantee.** The classifier analyzes URL text and does not fetch the page, follow redirects, or verify its current reputation. Do not rely on it as the sole security check.
-- **Banana predictions are visual classes, not measured expiry dates.** The displayed day ranges are rough room-temperature guidance; storage conditions matter, and model confidence is not calibrated.
-- **Employee SQL support is intentionally limited** to the employee table and query patterns implemented in `ask_query.py`. Review the generated result before using this demo with non-sample data.
+## Data Sources and Attribution
 
-## Notebooks
+### Banana Image Dataset
 
-Run notebooks from the repository root so their relative `data/` paths resolve correctly:
+The banana ripeness images are sourced from:
+
+[Banana Ripeness Classification – Roboflow Universe](https://universe.roboflow.com/roboflow-universe-projects/banana-ripeness-classification)
+
+The dataset is provided under the **CC BY 4.0** license.
+
+The notebook downloads a pinned dataset archive from:
+
+[Banana Ripeness Dataset – Hugging Face](https://huggingface.co/datasets/Sapek007/banana-ripeness)
+
+### URL Dataset
+
+The URL classifier uses the publicly available `malicious_phish.csv` dataset from:
+
+[URL Dataset – GitHub](https://github.com/SahinMuhammetAbdullah/urldataset)
+
+Check the original dataset's terms and licensing conditions before redistribution.
+
+### Employee Query Dataset
+
+The employee intent and ambiguity datasets are generated locally using synthetic templates through `build_query_datasets.py`.
+
+---
+
+## Important Limitations
+
+### URL Risk Classifier
+
+* Predictions are estimates, not a guarantee of website safety.
+* The classifier analyzes URL text only.
+* It does not open websites, follow redirects, or verify real-time URL reputation.
+* It should not be used as the only security mechanism.
+
+### Banana Ripeness Classifier
+
+* Predictions represent visual ripeness categories, not exact expiry dates.
+* Storage-day estimates are approximate.
+* Actual banana freshness depends on temperature, humidity, and storage conditions.
+* Model confidence is not calibrated.
+
+### Employee Query Assistant
+
+* SQL generation is limited to the employee table and query patterns implemented in `ask_query.py`.
+* The application is designed for demonstration purposes.
+* Generated SQL should be reviewed before using the system with real employee data.
+* Data-changing queries require user confirmation.
+
+---
+
+## Running Jupyter Notebooks
+
+To explore the model training and evaluation workflows, start Jupyter Notebook from the repository root:
 
 ```bash
 jupyter notebook
 ```
 
-The notebooks contain the data preparation, training, and evaluation workflows for the corresponding demos.
+Available notebooks:
+
+| Notebook       | Purpose                                                   |
+| -------------- | --------------------------------------------------------- |
+| `ml.ipynb`     | Employee intent classification and ambiguity detection    |
+| `url.ipynb`    | URL feature extraction, model training, and evaluation    |
+| `banana.ipynb` | Image dataset preparation, model training, and evaluation |
+
+**Important:** Always run the notebooks from the repository root directory so that relative `data/` paths work correctly.
+
+---
+
+## Project Summary
+
+| Project                    | Machine Learning Task | Output                   |
+| -------------------------- | --------------------- | ------------------------ |
+| Employee Query Assistant   | Text Classification   | Supported MySQL Queries  |
+| URL Risk Classifier        | Binary Classification | URL Risk Prediction      |
+| Banana Ripeness Classifier | Image Classification  | Banana Ripeness Category |
+
+This repository demonstrates practical applications of machine learning in natural-language processing, URL classification, and computer vision.
